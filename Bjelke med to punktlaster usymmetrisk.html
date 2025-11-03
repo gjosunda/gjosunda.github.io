@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="no">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>To usymmetriske punktlaster på bjelke</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>.value{font-variant-numeric:tabular-nums}</style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <div class="max-w-5xl mx-auto p-6">
+    <header class="mb-6">
+      <h1 class="text-2xl md:text-3xl font-semibold">To punktlaster – usymmetrisk</h1>
+      <p class="text-slate-600 mt-1">En enkeltspenn bjelke (lengde ℓ) med to punktlaster F₁ og F₂ plassert hhv. i avstand <em>a</em> fra venstre opplag (R₁) og <em>b</em> fra høyre opplag (R₂). Formler fra figuren: <span class="font-mono">R₁ = [F₁(ℓ−a)+F₂b]/ℓ</span>, <span class="font-mono">R₂ = [F₁a+F₂(ℓ−b)]/ℓ</span>. Skjær og moment er stykkevis langs lengden.</p>
+    </header>
+
+    <section class="grid md:grid-cols-2 gap-6">
+      <div class="bg-white rounded-2xl shadow p-5">
+        <h2 class="font-medium mb-3">Inndata</h2>
+        <div class="grid grid-cols-2 gap-3 items-end">
+          <label class="block">
+            <span class="text-sm text-slate-600">Lengde, ℓ (m)</span>
+            <input id="L" type="number" step="0.001" min="0" value="8.0" class="mt-1 w-full rounded-xl border-slate-300 focus:ring-2 focus:ring-indigo-500" />
+          </label>
+          <label class="block">
+            <span class="text-sm text-slate-600">a (m) – fra R₁ til F₁</span>
+            <input id="a" type="number" step="0.001" min="0" value="2.0" class="mt-1 w-full rounded-xl border-slate-300 focus:ring-2 focus:ring-indigo-500" />
+          </label>
+        </div>
+        <div class="grid grid-cols-2 gap-3 items-end mt-3">
+          <label class="block">
+            <span class="text-sm text-slate-600">b (m) – fra R₂ til F₂</span>
+            <input id="b" type="number" step="0.001" min="0" value="1.5" class="mt-1 w-full rounded-xl border-slate-300 focus:ring-2 focus:ring-indigo-500" />
+          </label>
+          <div></div>
+        </div>
+        <div class="grid grid-cols-3 gap-3 items-end mt-3">
+          <label class="block col-span-1">
+            <span class="text-sm text-slate-600">F₁</span>
+            <input id="F1" type="number" step="0.001" min="0" value="50" class="mt-1 w-full rounded-xl border-slate-300 focus:ring-2 focus:ring-indigo-500" />
+          </label>
+          <label class="block col-span-1">
+            <span class="text-sm text-slate-600">F₂</span>
+            <input id="F2" type="number" step="0.001" min="0" value="35" class="mt-1 w-full rounded-xl border-slate-300 focus:ring-2 focus:ring-indigo-500" />
+          </label>
+          <label class="block col-span-1">
+            <span class="text-sm text-slate-600">Enhet</span>
+            <select id="Funit" class="mt-1 w-full rounded-xl border-slate-300 focus:ring-2 focus:ring-indigo-500">
+              <option value="kN" selected>kN</option>
+              <option value="N">N</option>
+            </select>
+          </label>
+        </div>
+        <div class="grid grid-cols-3 gap-3 items-end mt-3">
+          <label class="block col-span-2">
+            <span class="text-sm text-slate-600">x (m) – posisjon for V(x)/M(x)</span>
+            <input id="x" type="number" step="0.001" min="0" value="3.0" class="mt-1 w-full rounded-xl border-slate-300 focus:ring-2 focus:ring-indigo-500" />
+          </label>
+          <button id="calc" class="self-end px-4 py-2 rounded-2xl bg-indigo-600 text-white shadow hover:bg-indigo-700">Beregn</button>
+        </div>
+        <p id="warn" class="hidden mt-3 text-amber-700 bg-amber-50 border border-amber-200 px-3 py-2 rounded-xl text-sm"></p>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow p-5">
+        <h2 class="font-medium mb-3">Formler (referanse)</h2>
+        <ul class="text-sm list-disc pl-5 space-y-2 text-slate-700">
+          <li><span class="font-mono">R₁ = [F₁(ℓ−a) + F₂ b] / ℓ</span>, <span class="font-mono">R₂ = [F₁ a + F₂(ℓ−b)] / ℓ</span>.</li>
+          <li>Skjær: V(x) = R₁ − H(x−a)F₁ − H(x−(ℓ−b))F₂. (H er Heaviside.)</li>
+          <li>Moment: M(x) = R₁x − F₁⟨x−a⟩ − F₂⟨x−(ℓ−b)⟩, der ⟨u⟩ = max(u,0).</li>
+          <li>Feltmomenter ved støtte-sidene: hvis <span class="font-mono">R₁ &lt; F₁</span>, så <span class="font-mono">M₁<sub>max</sub> = R₁a</span> ved <span class="font-mono">x=a</span>. Hvis <span class="font-mono">R₂ &lt; F₂</span>, så <span class="font-mono">M₂<sub>max</sub> = R₂b</span> ved <span class="font-mono">x=ℓ−b</span>.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="mt-8">
+      <h2 class="text-xl font-medium mb-3">Resultater</h2>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-white rounded-2xl shadow p-5">
+          <h3 class="font-semibold mb-3">Reaksjoner og skjær</h3>
+          <ul class="space-y-2 text-sm">
+            <li>R₁ = V₁ = <span id="R1" class="value font-mono"></span></li>
+            <li>R₂ = V₂ = <span id="R2" class="value font-mono"></span></li>
+            <li>V(x) = <span id="Vx" class="value font-mono"></span></li>
+          </ul>
+        </div>
+        <div class="bg-white rounded-2xl shadow p-5">
+          <h3 class="font-semibold mb-3">Momenter</h3>
+          <ul class="space-y-2 text-sm">
+            <li>M(x) = <span id="Mx" class="value font-mono"></span></li>
+            <li>M₁<sub>max</sub> (hvis R₁ &lt; F₁) = <span id="M1" class="value font-mono"></span></li>
+            <li>M₂<sub>max</sub> (hvis R₂ &lt; F₂) = <span id="M2" class="value font-mono"></span></li>
+          </ul>
+        </div>
+      </div>
+      <p class="text-xs text-slate-500 mt-3">Resultater vises i SI (N, N·m) og også i kN/kN·m. Ved ugyldige inndata (f.eks. a+b &gt; ℓ) vises advarsel.</p>
+    </section>
+  </div>
+
+  <script>
+  function fmtForce(N){if(!isFinite(N)) return '—'; const kN=N/1000;return `${N.toFixed(2)} N  (${kN.toFixed(3)} kN)`}
+  function fmtMoment(Nm){if(!isFinite(Nm)) return '—'; const kNm=Nm/1000;return `${Nm.toFixed(2)} N·m  (${kNm.toFixed(3)} kN·m)`}
+
+  function calc(){
+    try{
+      const L = Number(document.getElementById('L').value)||0;
+      const a = Number(document.getElementById('a').value)||0;
+      const b = Number(document.getElementById('b').value)||0;
+      const F1in = Number(document.getElementById('F1').value)||0;
+      const F2in = Number(document.getElementById('F2').value)||0;
+      const funit = document.getElementById('Funit').value;
+      const x = Number(document.getElementById('x').value)||0;
+
+      const F1 = funit==='kN'?F1in*1000:F1in; // N
+      const F2 = funit==='kN'?F2in*1000:F2in; // N
+
+      const warn = document.getElementById('warn');
+      if(a<0||b<0||L<=0||a> L || b> L || a + b > L){
+        warn.classList.remove('hidden');
+        warn.textContent = 'Sjekk geometri: a ≥ 0, b ≥ 0, a + b ≤ ℓ og ℓ > 0.';
+      } else { warn.classList.add('hidden'); }
+
+      // Reaksjoner (fra figuren)
+      const R1 = (F1*(L-a) + F2*b)/L;
+      const R2 = (F1*a + F2*(L-b))/L;
+
+      // Posisjoner til lastene langs x fra venstre
+      const x1 = a;           // F1
+      const x2 = L - b;       // F2
+
+      // Skjær og moment generelt (Heaviside/triangle area-prinsipp)
+      const H1 = x >= x1 ? 1 : 0;
+      const H2 = x >= x2 ? 1 : 0;
+      const Vx = R1 - H1*F1 - H2*F2;
+      const pos = (u)=> Math.max(u,0);
+      const Mx = R1*x - F1*pos(x - x1) - F2*pos(x - x2);
+
+      // Feltmomenter nær støtte (vises bare når aktuelt)
+      const showM1 = (R1 < F1 && a>0);
+      const showM2 = (R2 < F2 && b>0);
+      const M1max = showM1 ? R1*a : NaN;
+      const M2max = showM2 ? R2*b : NaN;
+
+      document.getElementById('R1').textContent = fmtForce(R1);
+      document.getElementById('R2').textContent = fmtForce(R2);
+      document.getElementById('Vx').textContent = fmtForce(Vx);
+      document.getElementById('Mx').textContent = fmtMoment(Mx);
+      document.getElementById('M1').textContent = showM1 ? fmtMoment(M1max) : '—';
+      document.getElementById('M2').textContent = showM2 ? fmtMoment(M2max) : '—';
+    } catch(err){
+      const warn = document.getElementById('warn');
+      warn.classList.remove('hidden');
+      warn.textContent = 'Noe gikk galt i beregningen: ' + (err?.message||err);
+    }
+  }
+
+  // Vent til DOM er klar før vi kobler knapper
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('calc').addEventListener('click', calc);
+    ['L','a','b','F1','F2','Funit','x'].forEach(id=>{
+      const el = document.getElementById(id); if(el){ el.addEventListener('change', calc); }
+    });
+    calc();
+  });
+</script>
+</body>
+</html>

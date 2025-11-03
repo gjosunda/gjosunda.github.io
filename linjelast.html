@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bjelkelast Kalkulator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin: 0 auto;
+            max-width: 400px;
+        }
+        input, button {
+            margin-top: 10px;
+            padding: 10px;
+            width: 100%;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bjelkelast Kalkulator</h1>
+        
+        <label for="deadLoad">Egenlast (kN/m²):</label>
+        <input type="number" id="deadLoad" placeholder="Legg inn egenlast">
+
+        <label for="liveLoad">Nyttelast (kN/m²):</label>
+        <input type="number" id="liveLoad" placeholder="Legg inn nyttelast">
+
+        <label for="width">Dekkbredde (m):</label>
+        <input type="number" id="width" placeholder="Bredde på dekket">
+
+        <label for="beamSpacing">Avstand mellom bjelker (m):</label>
+        <input type="number" id="beamSpacing" placeholder="Avstand mellom bjelker">
+
+        <button onclick="calculateBeamLoad()">Beregn Linjelast</button>
+
+        <h2 id="result"></h2>
+    </div>
+
+    <script>
+        function calculateBeamLoad() {
+            const deadLoad = parseFloat(document.getElementById('deadLoad').value);
+            const liveLoad = parseFloat(document.getElementById('liveLoad').value);
+            const width = parseFloat(document.getElementById('width').value);
+            const beamSpacing = parseFloat(document.getElementById('beamSpacing').value);
+
+            if (isNaN(deadLoad) || isNaN(liveLoad) || isNaN(width) || isNaN(beamSpacing)) {
+                document.getElementById('result').textContent = "Vennligst fyll ut alle verdiene.";
+                return;
+            }
+
+            // Beregn linjelast
+            const lineLoad = ((deadLoad + liveLoad) * width) / beamSpacing;
+            document.getElementById('result').textContent = "Total linjelast på bjelken: " + lineLoad.toFixed(2) + " kN/m";
+        }
+    </script>
+</body>
+</html>
